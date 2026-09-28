@@ -1,5 +1,4 @@
-![alt text](image-1.png)
-![alt text](image-2.png)
+
 # Mini Payroll System (Nepal)
 
 A small end-to-end payroll system that follows how Nepali payroll actually works: SSF, progressive income tax (TDS), an in-house security fund, advances, reimbursements, dynamic allowances, and an admin-only "secret" pay component. It runs fully locally with no cloud services or paid APIs.
@@ -447,7 +446,8 @@ Generate these from the running system and save the browser's *Print → Save as
   "effectiveDate": "2026-09-01T00:00:00.000Z"
 }
 ```
-
+![alt text](image-1.png)
+![alt text](image-2.png)
 Create one employee with `ssfStatus: "SSF"` and one with `ssfStatus: "NON_SSF"`. Run payroll for both (or use `run-batch`), then open each payslip URL.
 
 **Suggested demo scenarios**
