@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { reimbursementController } from "./reimbursement.controller.ts";
+import { validate } from "../../middleware/validator.middleware.ts";
+import { reimbursementSchema } from "./reimbursement.schema.ts";
 
 export const reimbursementRouter = Router();
 
@@ -13,7 +15,11 @@ reimbursementRouter.get(
 );
 
 reimbursementRouter.get("/", reimbursementController.getReimbursements);
-reimbursementRouter.post("/", reimbursementController.createReimbursement);
+reimbursementRouter.post(
+  "/",
+  validate(reimbursementSchema),
+  reimbursementController.createReimbursement,
+);
 
 reimbursementRouter.get("/:id", reimbursementController.getReimbursementById);
 reimbursementRouter.patch("/:id", reimbursementController.updateReimbursement);

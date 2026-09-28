@@ -7,6 +7,7 @@ import Allowances from "./features/allowance/pages/AllowancePage";
 import SalaryPage from "./features/salaries/pages/SalaryPage";
 import PayrollConfigPage from "./features/payrollConfig/pages/PayrollConfigPage";
 import AdvancePage from "./features/advance/pages/AdvancePage";
+import ReimbursementPage from "./features/reimbursement/pages/ReimbursementPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/salaries" element={<SalaryPage />} />
         <Route path="/payroll-config" element={<PayrollConfigPage />} />
         <Route path="/advances" element={<AdvancePage />} />
+        <Route path="/reimbursements" element={<ReimbursementPage />} />
       </Routes>
     </BrowserRouter>
   );
