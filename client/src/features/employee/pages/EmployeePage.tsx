@@ -20,7 +20,7 @@ const STATUS_STYLES: Record<Status, string> = {
 const EMPLOYMENT_TYPE_LABELS: Record<Employee["employmentType"], string> = {
   FULL_TIME: "Full-time",
   PART_TIME: "Part-time",
-  CONTRACTOR: "Contractor",
+  CONTRACT: "Contractor",
 };
 
 const formatDate = (iso: string) =>

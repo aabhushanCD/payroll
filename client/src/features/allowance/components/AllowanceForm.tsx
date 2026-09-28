@@ -4,6 +4,11 @@ import { X, ChevronDown } from "lucide-react";
 
 import type { AllowanceFormData } from "../schema/AllowanceSchema";
 import type { Allowance } from "../types/AllowanceTypes";
+import {
+  errorClass,
+  fieldClass,
+  labelClass,
+} from "../../../common/styles/formStyles";
 
 const CALCULATION_TYPES: AllowanceFormData["calculationType"][] = [
   "FIXED",
@@ -17,6 +22,7 @@ const EMPTY_VALUES: AllowanceFormData = {
   defaultAmount: 0,
   taxable: true,
   isActive: true,
+  isSecret: false,
 };
 
 type Props = {
@@ -26,11 +32,6 @@ type Props = {
   onClose: () => void;
   onSubmit: (input: AllowanceFormData) => void;
 };
-
-const fieldClass =
-  "w-full px-3 py-2 rounded-md bg-[#0F1B26] border border-[#233647] text-sm placeholder:text-[#7E93A6] focus:outline-none focus:border-[#C89B4C]";
-const labelClass = "text-xs font-medium text-[#7E93A6]";
-const errorClass = "text-xs text-[#E38080]";
 
 // Small reusable toggle so taxable/isActive read as switches, not checkboxes.
 const Toggle = ({

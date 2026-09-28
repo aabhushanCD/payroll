@@ -5,4 +5,5 @@ export interface AllowanceFormData {
   defaultAmount: number;
   taxable: boolean;
   isActive: boolean;
+  isSecret: boolean;
 }
