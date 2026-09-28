@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 import PayrollRun from "./payrollRun.model.ts";
 import type { PayrollRunDocument } from "./payrollRun.model.ts";
-import { calculatePayroll } from "./payroll.engine.ts";
+import { calculatePayroll, round2 } from "./payroll.engine.ts";
 
 import { AppError } from "../../utils/appError.ts";
 import { getEmployeeById } from "../employee/employee.services.ts";
@@ -11,7 +11,11 @@ import { payrollConfigService } from "../payrollConfig/payrollconfig.service.ts"
 import type { AllowanceLine, ReimbursementLine } from "./payroll.types.ts";
 import { reimbursementService } from "../reimbursement/reimbursement.services.ts";
 import { advanceService } from "../advance/advance.services.ts";
-import type { RunPayrollInput } from "./payrollRun.schema.ts";
+import type {
+  RunPayrollBatchInput,
+  RunPayrollInput,
+} from "./payrollRun.schema.ts";
+import Employee from "../employee/employee.model.ts";
 
 /**
  * ASSUMPTION: standard monthly hours used for the overtime hourly-rate
@@ -134,7 +138,27 @@ const resolveAdvanceRecovery = (
 
   return { totalRecovery, allocations };
 };
+// helper function to calcuate proration or partial salary or actual salary if the employee joined in the middle of the month or left in the middle of the month
+const MS_PER_DAY = 86_400_000;
+const toUtcDay = (d: Date) =>
+  Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 
+const calcProration = (
+  joiningDate: Date,
+  periodStart: Date,
+  periodEnd: Date,
+) => {
+  const start = toUtcDay(periodStart);
+  const end = toUtcDay(periodEnd);
+  const totalDays = (end - start) / MS_PER_DAY + 1;
+  const effectiveStart = Math.max(toUtcDay(joiningDate), start);
+  const payableDays = (end - effectiveStart) / MS_PER_DAY + 1;
+
+  if (payableDays <= 0) {
+    throw new AppError("Employee joined after this pay period ended", 400);
+  }
+  return { totalDays, payableDays, factor: payableDays / totalDays };
+};
 const runPayroll = async (
   input: RunPayrollInput,
 ): Promise<PayrollRunDocument> => {
@@ -161,6 +185,12 @@ const runPayroll = async (
   // internally if the id doesn't resolve, so no null-check is needed here
   // — if we reach the next line, `employee` is guaranteed non-null.
   const employee = await getEmployeeById(employeeId);
+
+  const { totalDays, payableDays, factor } = calcProration(
+    employee.joiningDate,
+    periodStart,
+    periodEnd,
+  );
 
   // ---- Edge case 3: duplicate run for this employee + period ----
   const existingRun = await PayrollRun.findOne({ employeeId, periodStart });
@@ -243,6 +273,7 @@ const runPayroll = async (
     hoursWorked,
     standardMonthlyHours: STANDARD_MONTHLY_HOURS,
     oneTimeReimbursements,
+    prorationFactor: factor,
     recurringReimbursements,
     advanceRecoveryAmount: 0,
     config: {
@@ -273,6 +304,7 @@ const runPayroll = async (
     standardMonthlyHours: STANDARD_MONTHLY_HOURS,
     oneTimeReimbursements,
     recurringReimbursements,
+    prorationFactor: factor,
     advanceRecoveryAmount: totalRecovery,
     config: {
       ssfEmployeeRate: config.ssfEmployeeRate,
@@ -292,7 +324,13 @@ const runPayroll = async (
     periodEnd,
     status: "FINALIZED",
     ssfStatus: employee.ssfStatus,
-    allowances: allowanceLines,
+    allowances: allowanceLines.map((a) => ({
+      ...a,
+      amount: round2(a.amount * factor), // snapshot what was actually paid
+    })),
+    payableDays,
+    totalDays,
+    prorationFactor: factor,
     hoursWorked,
     standardMonthlyHours: STANDARD_MONTHLY_HOURS,
     oneTimeReimbursements: oneTimeReimbursements.map(
@@ -385,10 +423,83 @@ const getPayrollRunsBySsfStatus = async (
     .sort({ periodStart: -1 });
 };
 
+const runPayrollBatch = async (input: RunPayrollBatchInput) => {
+  const { periodStart, periodEnd, ssfStatus, hoursByEmployee } = input;
+
+  const filter: Record<string, unknown> = { status: "ACTIVE" };
+  if (ssfStatus) filter.ssfStatus = ssfStatus;
+
+  const employees = await Employee.find(filter);
+
+  const succeeded: {
+    employeeId: string;
+    name: string;
+    payrollRunId: string;
+    netPay: number;
+  }[] = [];
+  const skipped: { employeeId: string; name: string; reason: string }[] = [];
+  const failed: { employeeId: string; name: string; reason: string }[] = [];
+
+  // Sequential on purpose: each run mutates advances/reimbursements, and
+  // sequential keeps failures easy to attribute and DB load predictable.
+  for (const emp of employees) {
+    const employeeId = emp._id.toString();
+
+    // Don't pay someone for a period that ended before they joined
+    if (emp.joiningDate > periodEnd) {
+      skipped.push({
+        employeeId,
+        name: emp.name,
+        reason: "Joined after this pay period ended",
+      });
+      continue;
+    }
+
+    try {
+      const run = await runPayroll({
+        employeeId,
+        periodStart,
+        periodEnd,
+        hoursWorked: hoursByEmployee?.[employeeId] ?? 0,
+      });
+      succeeded.push({
+        employeeId,
+        name: emp.name,
+        payrollRunId: run._id.toString(),
+        netPay: run.netPay,
+      });
+    } catch (err) {
+      const statusCode = (err as { statusCode?: number }).statusCode;
+      const reason = err instanceof Error ? err.message : "Unknown error";
+
+      if (statusCode === 409) {
+        skipped.push({
+          employeeId,
+          name: emp.name,
+          reason: "Already processed for this period",
+        });
+      } else {
+        failed.push({ employeeId, name: emp.name, reason });
+      }
+    }
+  }
+
+  return {
+    totalEmployees: employees.length,
+    succeededCount: succeeded.length,
+    skippedCount: skipped.length,
+    failedCount: failed.length,
+    succeeded,
+    skipped,
+    failed,
+  };
+};
+
 export const payrollRunService = {
   runPayroll,
   getPayrollRuns,
   getPayrollRunById,
   getPayrollRunsByEmployee,
   getPayrollRunsBySsfStatus,
+  runPayrollBatch,
 };

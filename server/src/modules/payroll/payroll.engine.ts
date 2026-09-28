@@ -47,7 +47,7 @@ import type { PayrollCalcInput, PayrollCalcResult } from "./payroll.types.ts";
  *    netPay — i.e. everything the employee-facing payslip shows.
  */
 
-const round2 = (n: number): number => Math.round(n * 100) / 100;
+export const round2 = (n: number): number => Math.round(n * 100) / 100;
 
 /**
  * Applies Nepal's progressive tax slabs to an ANNUAL income figure.
@@ -109,22 +109,34 @@ export const calculatePayroll = (
 ): PayrollCalcResult => {
   const {
     ssfStatus,
-    basicSalary,
-    allowances,
+    basicSalary, // FULL-month basic, as stored on the Salary record
+    allowances, // FULL-month amounts
     hoursWorked,
     standardMonthlyHours,
     oneTimeReimbursements,
     recurringReimbursements,
     advanceRecoveryAmount,
     config,
+    prorationFactor = 1,
   } = input;
 
-  const visibleAllowances = allowances.filter((a) => !a.isSecret);
-  const secretAllowances = allowances.filter((a) => a.isSecret);
+  const isSsf = ssfStatus === "SSF";
+
+  // ---- Prorated earnings (what is actually paid this period) ----
+  const proratedBasic = round2(basicSalary * prorationFactor);
+  const scaledAllowances = allowances.map((a) => ({
+    ...a,
+    amount: round2(a.amount * prorationFactor),
+  }));
+
+  const visibleAllowances = scaledAllowances.filter((a) => !a.isSecret);
+  const secretAllowances = scaledAllowances.filter((a) => a.isSecret);
 
   const visibleAllowanceTotal = round2(sumAmounts(visibleAllowances));
   const secretAllowanceTotal = round2(sumAmounts(secretAllowances));
 
+  // Overtime hourly rate uses the FULL basic: working fewer days this month
+  // doesn't make an overtime hour worth less.
   const overtimePay = round2(
     calculateOvertimePay(
       basicSalary,
@@ -140,7 +152,7 @@ export const calculatePayroll = (
   );
 
   const grossEarningsVisible = round2(
-    basicSalary +
+    proratedBasic +
       visibleAllowanceTotal +
       overtimePay +
       oneTimeReimbursementTotal +
@@ -150,40 +162,33 @@ export const calculatePayroll = (
     grossEarningsVisible + secretAllowanceTotal,
   );
 
-  // ---- SSF (basic only, per assumption #1) ----
-  const isSsf = ssfStatus === "SSF";
-  const ssfBase = basicSalary;
+  // ---- SSF and Security Fund follow the PRORATED basic ----
   const ssfEmployeeContribution = isSsf
-    ? round2(ssfBase * config.ssfEmployeeRate)
+    ? round2(proratedBasic * config.ssfEmployeeRate)
     : 0;
   const ssfEmployerContribution = isSsf
-    ? round2(ssfBase * config.ssfEmployerRate)
+    ? round2(proratedBasic * config.ssfEmployerRate)
     : 0;
+  const securityFundDeduction = round2(proratedBasic * config.securityFundRate);
 
-  // ---- In-house Security Fund (basic only, per assumption #2) ----
-  const securityFundDeduction = round2(basicSalary * config.securityFundRate);
-
-  // ---- Taxable income (secret allowances + non-taxable lines excluded) ----
-  const taxableAllowanceTotal = sumTaxable(visibleAllowances);
-  const taxableOneTime = sumTaxable(oneTimeReimbursements);
-  const taxableRecurring = sumTaxable(recurringReimbursements);
-
-  const monthlyTaxableIncome = round2(
+  // ---- TDS: annualize the FULL-month equivalent, then prorate the result ----
+  // If we annualized the half-month income directly, the employee would look
+  // like they earn half as much per year and fall into a lower slab.
+  const fullMonthTaxable = round2(
     basicSalary +
-      taxableAllowanceTotal +
-      overtimePay + // assumption #5: overtime is taxable
-      taxableOneTime +
-      taxableRecurring -
-      ssfEmployeeContribution, // assumption #4: SSF employee contribution is tax-deductible
+      sumTaxable(allowances.filter((a) => !a.isSecret)) + // full amounts
+      overtimePay +
+      sumTaxable(oneTimeReimbursements) +
+      sumTaxable(recurringReimbursements) -
+      (isSsf ? round2(basicSalary * config.ssfEmployeeRate) : 0),
   );
 
-  const annualizedTaxableIncome = round2(
-    Math.max(monthlyTaxableIncome, 0) * 12,
-  );
+  const monthlyTaxableIncome = fullMonthTaxable;
+  const annualizedTaxableIncome = round2(Math.max(fullMonthTaxable, 0) * 12);
   const annualTax = round2(
     calculateAnnualTax(annualizedTaxableIncome, config.taxSlabs),
   );
-  const incomeTax = round2(annualTax / 12);
+  const incomeTax = round2((annualTax / 12) * prorationFactor);
 
   const totalDeductionsVisible = round2(
     ssfEmployeeContribution +
@@ -193,13 +198,12 @@ export const calculatePayroll = (
   );
 
   const netPay = round2(grossEarningsVisible - totalDeductionsVisible);
-
   const totalEmployerCost = round2(
     grossEarningsAdmin + ssfEmployerContribution,
   );
 
   return {
-    basicSalary,
+    basicSalary: proratedBasic, // what was actually paid
     visibleAllowanceTotal,
     secretAllowanceTotal,
     overtimePay,

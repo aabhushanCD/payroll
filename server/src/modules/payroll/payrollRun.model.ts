@@ -30,7 +30,9 @@ export interface PayrollRunDocument extends mongoose.Document {
   periodStart: Date;
   periodEnd: Date;
   status: PayrollRunStatus;
-
+  payableDays: number;
+  totalDays: number;
+  prorationFactor: number;
   // ---- Inputs (snapshotted) ----
   ssfStatus: SSFStatus;
   basicSalary: number;
@@ -127,7 +129,9 @@ const PayrollRunSchema = new mongoose.Schema<PayrollRunDocument>(
       required: true,
       default: "FINALIZED",
     },
-
+    payableDays: { type: Number, required: true },
+    totalDays: { type: Number, required: true },
+    prorationFactor: { type: Number, required: true },
     ssfStatus: { type: String, enum: ["SSF", "NON_SSF"], required: true },
     basicSalary: { type: Number, required: true },
     allowances: { type: [AllowanceLineSchema], default: [] },

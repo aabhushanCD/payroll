@@ -34,6 +34,7 @@ export interface PayrollCalcInput {
   recurringReimbursements: ReimbursementLine[];
   advanceRecoveryAmount: number; // decided by the caller (payrollRun.service), not this engine
   config: PayrollCalcConfig;
+  prorationFactor?: number;
 }
 
 export interface PayrollCalcResult {

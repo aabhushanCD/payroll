@@ -18,3 +18,6 @@ payrollRoutes.post("/run", payrollRunController.runPayroll);
 
 payrollRoutes.get("/:id", payrollRunController.getPayrollRunById);
 payrollRoutes.get("/:id/payslip", payrollRunController.getPayslip);
+
+// Batch payroll run endpoint
+payrollRoutes.post("/run-batch", payrollRunController.runPayrollBatch);

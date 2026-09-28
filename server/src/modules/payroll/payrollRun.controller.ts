@@ -1,7 +1,10 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../utils/appError.ts";
 import { payrollRunService } from "./payrollRun.services.ts";
-import { runPayrollSchema } from "./payrollRun.schema.ts";
+import {
+  runPayrollBatchSchema,
+  runPayrollSchema,
+} from "./payrollRun.schema.ts";
 import {
   buildPayslipHtml,
   type PayslipData,
@@ -139,11 +142,21 @@ const getPayslip = async (req: Request, res: Response) => {
 
   res.status(200).setHeader("Content-Type", "text/html").send(html);
 };
+
+const runPayrollBatch = async (req: Request, res: Response) => {
+  const parsed = runPayrollBatchSchema.safeParse(req.body);
+  if (!parsed.success) {
+    throw new AppError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
+  }
+  const summary = await payrollRunService.runPayrollBatch(parsed.data);
+  res.status(200).json({ success: true, data: summary });
+};
 export const payrollRunController = {
   runPayroll,
   getPayrollRuns,
   getPayrollRunById,
   getPayrollRunsByEmployee,
   getPayrollRunsBySsfStatus,
+  runPayrollBatch,
   getPayslip,
 };
