@@ -1,20 +1,22 @@
 const colors: Record<string, string> = {
-  ACTIVE: "bg-green-100 text-green-700",
-  PENDING: "bg-yellow-100 text-yellow-700",
-  APPLIED: "bg-blue-100 text-blue-700",
-  SETTLED: "bg-gray-100 text-gray-700",
-  STOPPED: "bg-gray-100 text-gray-700",
-  SSF: "bg-indigo-100 text-indigo-700",
-  NON_SSF: "bg-orange-100 text-orange-700",
-  SECRET: "bg-red-100 text-red-700",
+  ACTIVE: "bg-green-500/15 text-green-400",
+  PENDING: "bg-[#C89B4C]/15 text-[#C89B4C]",
+  APPLIED: "bg-blue-500/15 text-blue-400",
+  SETTLED: "bg-[#233647] text-[#7E93A6]",
+  STOPPED: "bg-[#233647] text-[#7E93A6]",
+  SSF: "bg-indigo-500/15 text-indigo-300",
+  NON_SSF: "bg-orange-500/15 text-orange-300",
+  SECRET: "bg-[#E38080]/15 text-[#E38080]",
 };
 
-export const StatusBadge = ({ status }: { status: string }) => (
+const StatusBadge = ({ status }: { status: string }) => (
   <span
     className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-      colors[status] ?? "bg-gray-100 text-gray-700"
+      colors[status] ?? "bg-[#233647] text-[#7E93A6]"
     }`}
   >
     {status.replace("_", "-")}
   </span>
 );
+
+export default StatusBadge;

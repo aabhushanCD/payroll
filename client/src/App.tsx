@@ -6,6 +6,7 @@ import Employees from "./features/employee/pages/EmployeePage";
 import Allowances from "./features/allowance/pages/AllowancePage";
 import SalaryPage from "./features/salaries/pages/SalaryPage";
 import PayrollConfigPage from "./features/payrollConfig/pages/PayrollConfigPage";
+import AdvancePage from "./features/advance/pages/AdvancePage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/allowances" element={<Allowances />} />
         <Route path="/salaries" element={<SalaryPage />} />
         <Route path="/payroll-config" element={<PayrollConfigPage />} />
+        <Route path="/advances" element={<AdvancePage />} />
       </Routes>
     </BrowserRouter>
   );

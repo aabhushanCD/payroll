@@ -22,3 +22,10 @@ export const monthToPeriod = (ym: string) => {
     periodEnd: `${y}-${mm}-${String(last).padStart(2, "0")}`,
   };
 };
+
+export const employeeLabel = (id: unknown) => {
+  if (typeof id === "object" && id !== null && "name" in id) {
+    return String(id.name);
+  }
+  return "";
+};

@@ -4,7 +4,7 @@ export const advanceSchema = z.object({
   employeeId: z.string().min(1, "employeeId is required"),
   amount: z.number().positive("amount must be greater than 0"),
   reason: z.string().trim().optional(),
-  issuedDate: z.coerce.date(),
+  issuedDate: z.string(),
 });
 
 // outstandingBalance and status are set by the service, not accepted from the client

@@ -8,18 +8,12 @@ import type {
   SSF_STATUS,
   Status,
 } from "../types/types";
+import { toDateInputValue } from "../../../common/lib/toDateInputValue";
 
 const DEPARTMENTS = ["Finance", "Engineering", "People", "Design", "Sales"];
 const STATUSES: Status[] = ["ACTIVE", "ON_LEAVE", "Terminated"];
 const SSF_STATUSES: SSF_STATUS[] = ["SSF", "NON_SSF"];
 const EMPLOYEE_TYPES: EmploymentType[] = ["FULL_TIME", "PART_TIME", "CONTRACT"];
-
-const toDateInputValue = (value: string) => {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 10);
-};
 
 const EMPTY_VALUES: EmployeeFormData = {
   name: "",
