@@ -12,6 +12,7 @@ import { salaryRouter } from "./modules/salary/salary.routes.ts";
 import { advanceRouter } from "./modules/advance/advance.routes.ts";
 import { reimbursementRouter } from "./modules/reimbursement/reimbursement.routes.ts";
 import { payrollRoutes } from "./modules/payroll/payrollRun.routes.ts";
+import { payrollConfigRoutes } from "./modules/payrollConfig/payrollconfig.routes.ts";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.get("/api/v1/health", (req, res) => {
 app.use("/api/v1/employees", employeeRoutes);
 app.use("/api/v1/allowances", allowanceRouter);
 app.use("/api/v1/salaries", salaryRouter);
+app.use("/api/v1/payroll-config", payrollConfigRoutes);
 app.use("/api/v1/advances", advanceRouter);
 app.use("/api/v1/reimbursements", reimbursementRouter);
 app.use("/api/v1/payroll", payrollRoutes);
