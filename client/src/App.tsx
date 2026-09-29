@@ -8,18 +8,25 @@ import SalaryPage from "./features/salaries/pages/SalaryPage";
 import PayrollConfigPage from "./features/payrollConfig/pages/PayrollConfigPage";
 import AdvancePage from "./features/advance/pages/AdvancePage";
 import ReimbursementPage from "./features/reimbursement/pages/ReimbursementPage";
+import RunPayrollPage from "./features/payroll/pages/RunPayrollPage";
+import PayrollRunDetailPage from "./features/payroll/pages/PayrollRunDetailPage";
+import PayrollRunsPage from "./features/payroll/pages/PayrollRunsPage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/employees" element={<Employees />} />
-        <Route path="/allowances" element={<Allowances />} />
-        <Route path="/salaries" element={<SalaryPage />} />
-        <Route path="/payroll-config" element={<PayrollConfigPage />} />
-        <Route path="/advances" element={<AdvancePage />} />
-        <Route path="/reimbursements" element={<ReimbursementPage />} />
+        <Route path="/" element={<DashboardPage />}>
+          <Route path="employees" element={<Employees />} />
+          <Route path="allowances" element={<Allowances />} />
+          <Route path="salaries" element={<SalaryPage />} />
+          <Route path="payroll-config" element={<PayrollConfigPage />} />
+          <Route path="advances" element={<AdvancePage />} />
+          <Route path="reimbursements" element={<ReimbursementPage />} />
+          <Route path="payroll/" element={<PayrollRunsPage />} />
+          <Route path="payroll/run/" element={<RunPayrollPage />} />
+          <Route path="payroll/:id" element={<PayrollRunDetailPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

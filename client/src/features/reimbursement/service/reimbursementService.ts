@@ -14,22 +14,22 @@ const getPayableReimbursements = async (
   const response = await api.get(
     `/reimbursements/employee/${employeeId}/payable`,
   );
-  return response.data;
+  return response.data.data;
 };
 
 const createReimbursement = async (data: ReimbursementFormData) => {
   const response = await api.post("/reimbursements", data);
-  return response.data;
+  return response.data.data;
 };
 
 const applyReimbursement = async (id: string) => {
   const response = await api.post(`/reimbursements/${id}/apply`);
-  return response.data;
+  return response.data.data;
 };
 
 const stopReimbursement = async (id: string) => {
   const response = await api.post(`/reimbursements/${id}/stop`);
-  return response.data;
+  return response.data.data;
 };
 
 export const reimbursementServices = {

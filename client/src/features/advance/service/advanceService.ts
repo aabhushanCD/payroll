@@ -9,7 +9,7 @@ const getAdvances = async (): Promise<Advance[]> => {
 
 const getEmployeeAdvances = async (employeeId: string): Promise<Advance[]> => {
   const response = await api.get(`/advances/employee/${employeeId}`);
-  return response.data;
+  return response.data.data;
 };
 
 // Only what payroll can still recover. Used on the Run Payroll screen later.
@@ -17,12 +17,12 @@ const getActiveEmployeeAdvances = async (
   employeeId: string,
 ): Promise<Advance[]> => {
   const response = await api.get(`/advances/employee/${employeeId}/active`);
-  return response.data;
+  return response.data.data;
 };
 
 const createAdvance = async (data: AdvanceFormData) => {
   const response = await api.post("/advances", data);
-  return response.data;
+  return response.data.data;
 };
 
 export const advanceServices = {

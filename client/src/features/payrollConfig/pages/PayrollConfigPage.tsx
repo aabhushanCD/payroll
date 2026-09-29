@@ -40,7 +40,7 @@ const PayrollConfigPage = () => {
       : create.mutate(data, { onSuccess: close });
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="min-h-screen bg-[#0F1B26] text-[#E6ECF1] p-8 space-y-6 ">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">Payroll config</h1>
         <button
