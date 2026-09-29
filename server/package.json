@@ -7,7 +7,7 @@
     "dev": "nodemon --exec tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "seed": "tsx src/modules/seeds/initialEverythingSeeds.ts"
+    "seed": "tsx src/seeds/initialEverythingSeeds.ts"
   },
   "keywords": [],
   "author": "",
