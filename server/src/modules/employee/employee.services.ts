@@ -10,9 +10,9 @@ export const createEmployee = async (data: CreateEmployeeInput) => {
     ...data,
     payRate: Number(data.payRate),
     bank: {
-      name: data.bankName,
-      accountNumber: data.bankAccountNumber,
-      branch: data.bankBranch,
+      name: data.bank.name,
+      accountNumber: data.bank.accountNumber,
+      branch: data.bank.branch,
     },
   };
   const employee = new Employee(newEmployee);

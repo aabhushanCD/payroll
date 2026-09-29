@@ -16,11 +16,11 @@ export const EmployeeSelect = ({ value, onChange, error, disabled }: Props) => {
         value={value}
         disabled={disabled || isLoading}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+        className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm  text-gray-400"
       >
         <option value="">{isLoading ? "Loading..." : "Select employee"}</option>
         {employees.map((e) => (
-          <option key={e._id} value={e._id}>
+          <option key={e._id} value={e._id} className="truncate">
             {e.employeeCode} - {e.name}
           </option>
         ))}

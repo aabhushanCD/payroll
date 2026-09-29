@@ -11,12 +11,14 @@ import ReimbursementPage from "./features/reimbursement/pages/ReimbursementPage"
 import RunPayrollPage from "./features/payroll/pages/RunPayrollPage";
 import PayrollRunDetailPage from "./features/payroll/pages/PayrollRunDetailPage";
 import PayrollRunsPage from "./features/payroll/pages/PayrollRunsPage";
+import DashboardHome from "./features/dashboard/pages/DashboardHome";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<DashboardPage />}>
+          <Route index element={<DashboardHome />} />
           <Route path="employees" element={<Employees />} />
           <Route path="allowances" element={<Allowances />} />
           <Route path="salaries" element={<SalaryPage />} />

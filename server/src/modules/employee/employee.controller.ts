@@ -8,7 +8,9 @@ import {
 } from "./employee.services.ts";
 
 export const createEmployeeHandler = async (req: Request, res: Response) => {
+  console.log("Request body:", req.body); // Log the request body for debugging
   const employee = await createEmployee(req.body);
+
   res.status(201).json(employee);
 };
 
