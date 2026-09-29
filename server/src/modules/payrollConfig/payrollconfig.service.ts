@@ -35,6 +35,8 @@ const createPayrollConfig = async (
 ): Promise<PayrollConfigDocument> => {
   data.ssfEmployeeRate = Number(data.ssfEmployeeRate) / 100;
   data.ssfEmployerRate = Number(data.ssfEmployerRate) / 100;
+  data.securityFundRate = Number(data.securityFundRate) / 100;
+
   data.taxSlabs?.forEach((slab) => {
     slab.rate = Number(slab?.rate) / 100;
   });
