@@ -66,7 +66,7 @@ cp .env.example .env        # set VITE_API_BASE_URL if it differs from the defau
 npm run dev                 # starts the app, default http://localhost:5173
 ```
 
-The frontend expects the API at `http://localhost:5000/api/v1` by default. Update the axios base URL in `.env` (or `common/axiosInstance.ts`) if your backend runs elsewhere.
+The frontend expects the API at `http://localhost:3000/api/v1` by default. Update the axios base URL in `.env` (or `common/axiosInstance.ts`) if your backend runs elsewhere.
 
 **Try it end-to-end in five steps**
 
