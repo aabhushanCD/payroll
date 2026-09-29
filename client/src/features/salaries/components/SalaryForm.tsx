@@ -59,6 +59,7 @@ const SalaryForm = ({
     control,
     name: "allowances",
   });
+
   const rows = useWatch({ control, name: "allowances" });
 
   useEffect(() => {
@@ -83,7 +84,6 @@ const SalaryForm = ({
   const findAllowance = (id: string) => allowances.find((a) => a._id === id);
   const takenIds = (rows ?? []).map((r) => r.allowance);
   const selectable = allowances.filter((a) => a.isActive);
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-xl max-h-[90vh] flex flex-col rounded-lg border border-[#233647] bg-[#152331]">
@@ -185,38 +185,50 @@ const SalaryForm = ({
                   >
                     <div className="flex items-start gap-2">
                       <div className="relative flex-1">
-                        <select
-                          {...register(`allowances.${i}.allowance`, {
+                        <Controller
+                          control={control}
+                          name={`allowances.${i}.allowance`}
+                          rules={{
                             required: "Select an allowance",
                             validate: (v) =>
                               getValues("allowances").filter(
                                 (r) => r.allowance === v,
                               ).length === 1 || "Already added",
-                            onChange: (e) => {
-                              const a = findAllowance(e.target.value);
-                              // pre-fill only; the user can still change it, including to 0
-                              if (a)
-                                setValue(
-                                  `allowances.${i}.amount`,
-                                  a.defaultAmount ?? 0,
-                                );
-                            },
-                          })}
-                          className={`${fieldClass} appearance-none pr-8`}
-                        >
-                          <option value="">Select allowance</option>
-                          {selectable
-                            .filter(
-                              (a) =>
-                                a._id === rows?.[i]?.allowance ||
-                                !takenIds.includes(a._id),
-                            )
-                            .map((a) => (
-                              <option key={a._id} value={a._id}>
-                                {a.name} ({a.code})
+                          }}
+                          render={({ field }) => (
+                            <select
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(e.target.value);
+                                const a = findAllowance(e.target.value);
+                                // pre-fill only; the user can still change it, including to 0
+                                if (a)
+                                  setValue(
+                                    `allowances.${i}.amount`,
+                                    a.defaultAmount ?? 0,
+                                  );
+                              }}
+                              onBlur={field.onBlur}
+                              className={`${fieldClass} min-w-100! appearance-none pr-8`}
+                            >
+                              <option value="" className="text-[#7E93A6]">
+                                Select allowance
                               </option>
-                            ))}
-                        </select>
+                              {selectable
+                                .filter(
+                                  (a) =>
+                                    a._id === rows?.[i]?.allowance ||
+                                    !takenIds.includes(a._id),
+                                )
+                                .map((a) => (
+                                  <option key={a._id} value={a._id}>
+                                    {a.name} ({a.code})
+                                  </option>
+                                ))}
+                            </select>
+                          )}
+                        />
+
                         <ChevronDown
                           size={14}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7E93A6] pointer-events-none"
