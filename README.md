@@ -70,6 +70,11 @@ The frontend expects the API at `http://localhost:3000/api/v1` by default. Updat
 
 **Try it end-to-end in five steps**
 
+The fastes approach to run the System is
+npm run seed
+seed contails - employee, allowance, salaries, payroll-config, initial setup for the project
+
+Also continue and fully another approach with UI after that
 The fastest path is through the UI itself once both servers are running:
 
 1. Go to **Employees** and add one SSF employee and one non-SSF employee.
@@ -84,19 +89,19 @@ The same flow works via Thunder Client/Postman/curl against `http://localhost:50
 
 ## 2. Tech stack
 
-| Layer | Choice |
-|---|---|
-| Backend runtime | Node.js, TypeScript |
-| API | Express, with `express-async-errors` |
-| Database | MongoDB via Mongoose |
-| Backend validation | Zod |
-| Payslip | Server-rendered, print-friendly HTML (no external fonts or assets) |
-| Frontend | React, TypeScript, Vite |
-| Frontend data layer | TanStack Query |
-| Frontend forms | react-hook-form, Zod schemas |
-| Frontend styling | Tailwind CSS |
-| Frontend HTTP | axios (single shared instance) |
-| Frontend routing | react-router |
+| Layer               | Choice                                                             |
+| ------------------- | ------------------------------------------------------------------ |
+| Backend runtime     | Node.js, TypeScript                                                |
+| API                 | Express, with `express-async-errors`                               |
+| Database            | MongoDB via Mongoose                                               |
+| Backend validation  | Zod                                                                |
+| Payslip             | Server-rendered, print-friendly HTML (no external fonts or assets) |
+| Frontend            | React, TypeScript, Vite                                            |
+| Frontend data layer | TanStack Query                                                     |
+| Frontend forms      | react-hook-form, Zod schemas                                       |
+| Frontend styling    | Tailwind CSS                                                       |
+| Frontend HTTP       | axios (single shared instance)                                     |
+| Frontend routing    | react-router                                                       |
 
 MongoDB was chosen because allowances are dynamic. An allowance is just a document, so adding one never needs a schema change.
 
@@ -154,36 +159,36 @@ Every feature follows `components/ hooks/ pages/ schema/ service/ types/`, so a 
 
 ## 4. How it maps to the requirements
 
-| Requirement | Where / how |
-|---|---|
-| Employee CRUD, SSF vs non-SSF, bank details | `employee` module (backend) and Employees page (frontend). `ssfStatus` is `SSF` or `NON_SSF`. |
-| Fixed line items (DA, Conveyance) | Seeded as ordinary `Allowance` documents, so there is one earnings code path. |
-| Dynamic allowances without code changes | `Allowance` catalog + `Salary.allowances[]` (`{ allowance, amount }`). Adding one is a new document, and the Salary form's allowance rows editor picks it up immediately with no frontend change either. |
-| Overtime (hours × rate × multiplier) | Engine. Multiplier comes from `PayrollConfig` (default 1.5). Entered per run on the Run Payroll screen. |
-| One-time reimbursement | `Reimbursement` with `type: ONE_TIME`. `PENDING` becomes `APPLIED` once consumed by a run, or manually via the Reimbursements page. |
-| Recurring reimbursement | `Reimbursement` with `type: RECURRING`. `ACTIVE` until stopped from the Reimbursements page. |
-| Advance with outstanding balance | `Advance.outstandingBalance` plus an embedded `deductions[]` audit trail, visualized as a progress bar with an expandable history row. |
-| SSF 11% employee / 20% employer | Engine. Employee share is deducted; employer share is recorded as employer cost only, shown in the admin figures toggle on a run's detail page. |
-| Progressive TDS from a versioned table | `PayrollConfig.taxSlabs`, resolved by date. Nothing hardcoded. Editable via the Payroll Config tax slab editor, with ordering/open-ended-slab validation. |
-| In-house Security Fund (configurable %) | `PayrollConfig.securityFundRate`, kept separate from SSF. |
-| Secret / admin-only component | `Allowance.isSecret`. Excluded from TDS, hidden from the employee payslip, shown in the admin view, the admin-figures toggle on run detail, and the employer cost. |
-| SSF vs non-SSF separation and filtering | Engine branches on `ssfStatus`. Filter runs via `GET /payroll/ssf/:status`, the batch `ssfStatus` option, and the group filter on the Payroll Runs and Run Payroll pages. |
-| Payslip per employee per period | HTML payslip with employee and admin views, shown inline via an iframe with an Employee/Admin toggle and a print button. |
-| Role flag instead of real auth | `?view=admin` query parameter on the payslip endpoint, driven by the toggle in the frontend. |
+| Requirement                                 | Where / how                                                                                                                                                                                              |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Employee CRUD, SSF vs non-SSF, bank details | `employee` module (backend) and Employees page (frontend). `ssfStatus` is `SSF` or `NON_SSF`.                                                                                                            |
+| Fixed line items (DA, Conveyance)           | Seeded as ordinary `Allowance` documents, so there is one earnings code path.                                                                                                                            |
+| Dynamic allowances without code changes     | `Allowance` catalog + `Salary.allowances[]` (`{ allowance, amount }`). Adding one is a new document, and the Salary form's allowance rows editor picks it up immediately with no frontend change either. |
+| Overtime (hours × rate × multiplier)        | Engine. Multiplier comes from `PayrollConfig` (default 1.5). Entered per run on the Run Payroll screen.                                                                                                  |
+| One-time reimbursement                      | `Reimbursement` with `type: ONE_TIME`. `PENDING` becomes `APPLIED` once consumed by a run, or manually via the Reimbursements page.                                                                      |
+| Recurring reimbursement                     | `Reimbursement` with `type: RECURRING`. `ACTIVE` until stopped from the Reimbursements page.                                                                                                             |
+| Advance with outstanding balance            | `Advance.outstandingBalance` plus an embedded `deductions[]` audit trail, visualized as a progress bar with an expandable history row.                                                                   |
+| SSF 11% employee / 20% employer             | Engine. Employee share is deducted; employer share is recorded as employer cost only, shown in the admin figures toggle on a run's detail page.                                                          |
+| Progressive TDS from a versioned table      | `PayrollConfig.taxSlabs`, resolved by date. Nothing hardcoded. Editable via the Payroll Config tax slab editor, with ordering/open-ended-slab validation.                                                |
+| In-house Security Fund (configurable %)     | `PayrollConfig.securityFundRate`, kept separate from SSF.                                                                                                                                                |
+| Secret / admin-only component               | `Allowance.isSecret`. Excluded from TDS, hidden from the employee payslip, shown in the admin view, the admin-figures toggle on run detail, and the employer cost.                                       |
+| SSF vs non-SSF separation and filtering     | Engine branches on `ssfStatus`. Filter runs via `GET /payroll/ssf/:status`, the batch `ssfStatus` option, and the group filter on the Payroll Runs and Run Payroll pages.                                |
+| Payslip per employee per period             | HTML payslip with employee and admin views, shown inline via an iframe with an Employee/Admin toggle and a print button.                                                                                 |
+| Role flag instead of real auth              | `?view=admin` query parameter on the payslip endpoint, driven by the toggle in the frontend.                                                                                                             |
 
 ---
 
 ## 5. Data model
 
-| Collection | Purpose | Notable fields |
-|---|---|---|
-| `Employee` | Person record | `employeeCode`, `ssfStatus`, `joiningDate`, `bank`, `status` |
-| `Allowance` | Catalog of allowance types | `code` (unique), `calculationType`, `defaultAmount`, `taxable`, `isSecret`, `isActive` |
-| `Salary` | Effective-dated pay structure | `employeeId`, `basicSalary`, `allowances[{allowance, amount}]`, `effectiveDate` |
-| `PayrollConfig` | Rates per fiscal year | `fiscalYear` (unique), `ssfEmployeeRate`, `ssfEmployerRate`, `securityFundRate`, `overtimeMultiplier`, `taxSlabs[]`, `effectiveFrom` |
-| `Advance` | Advance + balance | `amount`, `outstandingBalance`, `status`, `deductions[]` |
-| `Reimbursement` | Reimbursement lifecycle | `type`, `status`, `taxable`, `appliedInPayrollRunId` |
-| `PayrollRun` | The payslip record | Snapshot of every input, every calculated figure, and the config used |
+| Collection      | Purpose                       | Notable fields                                                                                                                       |
+| --------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `Employee`      | Person record                 | `employeeCode`, `ssfStatus`, `joiningDate`, `bank`, `status`                                                                         |
+| `Allowance`     | Catalog of allowance types    | `code` (unique), `calculationType`, `defaultAmount`, `taxable`, `isSecret`, `isActive`                                               |
+| `Salary`        | Effective-dated pay structure | `employeeId`, `basicSalary`, `allowances[{allowance, amount}]`, `effectiveDate`                                                      |
+| `PayrollConfig` | Rates per fiscal year         | `fiscalYear` (unique), `ssfEmployeeRate`, `ssfEmployerRate`, `securityFundRate`, `overtimeMultiplier`, `taxSlabs[]`, `effectiveFrom` |
+| `Advance`       | Advance + balance             | `amount`, `outstandingBalance`, `status`, `deductions[]`                                                                             |
+| `Reimbursement` | Reimbursement lifecycle       | `type`, `status`, `taxable`, `appliedInPayrollRunId`                                                                                 |
+| `PayrollRun`    | The payslip record            | Snapshot of every input, every calculated figure, and the config used                                                                |
 
 Design notes:
 
@@ -234,12 +239,12 @@ Slabs are annual and payroll is monthly, so the engine:
 FY 2083/84 slabs (seeded as cumulative ceilings so the engine can walk them):
 
 | Annual taxable income (NPR) | Rate | Stored as `upTo` |
-|---|---|---|
-| First 10,00,000 | 1% | 1,000,000 |
-| Next 5,00,000 | 10% | 1,500,000 |
-| Next 10,00,000 | 20% | 2,500,000 |
-| Next 15,00,000 | 27% | 4,000,000 |
-| Above 40,00,000 | 29% | `null` |
+| --------------------------- | ---- | ---------------- |
+| First 10,00,000             | 1%   | 1,000,000        |
+| Next 5,00,000               | 10%  | 1,500,000        |
+| Next 10,00,000              | 20%  | 2,500,000        |
+| Next 15,00,000              | 27%  | 4,000,000        |
+| Above 40,00,000             | 29%  | `null`           |
 
 Example: NPR 15,00,000 annual income is `10,00,000 × 1% + 5,00,000 × 10% = 60,000`, an effective rate of 4%.
 
@@ -247,21 +252,21 @@ Example: NPR 15,00,000 annual income is `10,00,000 × 1% + 5,00,000 × 10% = 60,
 
 Basic 50,000. Allowances: DA 5,000, Conveyance 3,000, Transport 2,000 (all taxable). Confidential Retention Bonus 15,000 (secret, non-taxable). 10 overtime hours, `standardMonthlyHours = 200`, multiplier 1.5.
 
-| Line | Calculation | Amount |
-|---|---|---|
-| Overtime | 10 × (50,000 ÷ 200) × 1.5 | 3,750.00 |
-| Gross (employee view) | 50,000 + 10,000 + 3,750 | 63,750.00 |
-| Gross (admin view) | 63,750 + 15,000 | 78,750.00 |
-| SSF employee | 50,000 × 11% | 5,500.00 |
-| SSF employer | 50,000 × 20% | 10,000.00 |
-| Security fund | 50,000 × 1% | 500.00 |
-| Monthly taxable income | 50,000 + 10,000 + 3,750 − 5,500 | 58,250.00 |
-| Annualized | 58,250 × 12 | 699,000.00 |
-| Annual tax | 699,000 × 1% | 6,990.00 |
-| Monthly TDS | 6,990 ÷ 12 | 582.50 |
-| Total deductions | 5,500 + 582.50 + 500 | 6,582.50 |
-| **Net pay** | 63,750 − 6,582.50 | **57,167.50** |
-| Employer cost | 78,750 + 10,000 | 88,750.00 |
+| Line                   | Calculation                     | Amount        |
+| ---------------------- | ------------------------------- | ------------- |
+| Overtime               | 10 × (50,000 ÷ 200) × 1.5       | 3,750.00      |
+| Gross (employee view)  | 50,000 + 10,000 + 3,750         | 63,750.00     |
+| Gross (admin view)     | 63,750 + 15,000                 | 78,750.00     |
+| SSF employee           | 50,000 × 11%                    | 5,500.00      |
+| SSF employer           | 50,000 × 20%                    | 10,000.00     |
+| Security fund          | 50,000 × 1%                     | 500.00        |
+| Monthly taxable income | 50,000 + 10,000 + 3,750 − 5,500 | 58,250.00     |
+| Annualized             | 58,250 × 12                     | 699,000.00    |
+| Annual tax             | 699,000 × 1%                    | 6,990.00      |
+| Monthly TDS            | 6,990 ÷ 12                      | 582.50        |
+| Total deductions       | 5,500 + 582.50 + 500            | 6,582.50      |
+| **Net pay**            | 63,750 − 6,582.50               | **57,167.50** |
+| Employer cost          | 78,750 + 10,000                 | 88,750.00     |
 
 The secret Retention Bonus appears only in the admin gross and the employer cost. It never touches the employee's gross, tax base, deductions or net pay — and on the run detail page, it only appears once the "Show admin figures" toggle is switched on.
 
@@ -275,13 +280,13 @@ An employee who joins on 15 September is paid for 16 of 30 days (calendar days, 
 
 Expected values for basic 50,000, taxable allowances 10,000, no overtime, joining 15 Sep (hand-calculated; expect differences of a paisa or two from rounding):
 
-| Field | Expected |
-|---|---|
-| Basic paid | 26,666.67 |
-| SSF employee | 2,933.33 |
-| Security fund | 266.67 |
-| Monthly TDS | 290.67 |
-| Net pay | 28,509.34 |
+| Field         | Expected  |
+| ------------- | --------- |
+| Basic paid    | 26,666.67 |
+| SSF employee  | 2,933.33  |
+| Security fund | 266.67    |
+| Monthly TDS   | 290.67    |
+| Net pay       | 28,509.34 |
 
 ---
 
@@ -293,56 +298,56 @@ Base URL: `http://localhost:5000/api/v1`. All responses use `{ success, data }`.
 
 ### Employees, allowances, salaries
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET / POST | `/employees` | List / create |
-| GET / PATCH / DELETE | `/employees/:id` | Read / update / delete |
-| GET / POST | `/allowances` | List / create |
-| GET / PATCH / DELETE | `/allowances/:id` | Read / update / delete |
-| GET / POST | `/salaries` | List / create |
-| GET | `/salaries/employee/:employeeId/current?asOf=` | Salary effective on a date (what payroll uses) |
-| GET | `/salaries/employee/:employeeId` | Full version history |
-| GET / PATCH / DELETE | `/salaries/:id` | Read / update / delete |
+| Method               | Path                                           | Purpose                                        |
+| -------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| GET / POST           | `/employees`                                   | List / create                                  |
+| GET / PATCH / DELETE | `/employees/:id`                               | Read / update / delete                         |
+| GET / POST           | `/allowances`                                  | List / create                                  |
+| GET / PATCH / DELETE | `/allowances/:id`                              | Read / update / delete                         |
+| GET / POST           | `/salaries`                                    | List / create                                  |
+| GET                  | `/salaries/employee/:employeeId/current?asOf=` | Salary effective on a date (what payroll uses) |
+| GET                  | `/salaries/employee/:employeeId`               | Full version history                           |
+| GET / PATCH / DELETE | `/salaries/:id`                                | Read / update / delete                         |
 
 ### Payroll config
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET / POST | `/payroll-config` | List / create a new fiscal year |
-| GET | `/payroll-config/current?asOf=` | Config effective on a date |
-| GET | `/payroll-config/fiscal-year/:fy` | Config for one fiscal year |
-| PATCH / DELETE | `/payroll-config/:id` | Update / delete |
+| Method         | Path                              | Purpose                         |
+| -------------- | --------------------------------- | ------------------------------- |
+| GET / POST     | `/payroll-config`                 | List / create a new fiscal year |
+| GET            | `/payroll-config/current?asOf=`   | Config effective on a date      |
+| GET            | `/payroll-config/fiscal-year/:fy` | Config for one fiscal year      |
+| PATCH / DELETE | `/payroll-config/:id`             | Update / delete                 |
 
 ### Advances
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET / POST | `/advances` | List / create (starts `ACTIVE` with full balance) |
-| GET | `/advances/employee/:employeeId` | History |
-| GET | `/advances/employee/:employeeId/active` | Only what payroll can still recover |
-| POST | `/advances/:id/deduct` | Manually apply a deduction (payroll does this automatically) |
+| Method     | Path                                    | Purpose                                                      |
+| ---------- | --------------------------------------- | ------------------------------------------------------------ |
+| GET / POST | `/advances`                             | List / create (starts `ACTIVE` with full balance)            |
+| GET        | `/advances/employee/:employeeId`        | History                                                      |
+| GET        | `/advances/employee/:employeeId/active` | Only what payroll can still recover                          |
+| POST       | `/advances/:id/deduct`                  | Manually apply a deduction (payroll does this automatically) |
 
 ### Reimbursements
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET / POST | `/reimbursements` | List / create |
-| GET | `/reimbursements/employee/:employeeId/payable` | `PENDING` + `ACTIVE` items payroll will include |
-| POST | `/reimbursements/:id/apply` | Mark a one-time item consumed |
-| POST | `/reimbursements/:id/stop` | Stop a recurring item |
+| Method     | Path                                           | Purpose                                         |
+| ---------- | ---------------------------------------------- | ----------------------------------------------- |
+| GET / POST | `/reimbursements`                              | List / create                                   |
+| GET        | `/reimbursements/employee/:employeeId/payable` | `PENDING` + `ACTIVE` items payroll will include |
+| POST       | `/reimbursements/:id/apply`                    | Mark a one-time item consumed                   |
+| POST       | `/reimbursements/:id/stop`                     | Stop a recurring item                           |
 
 ### Payroll runs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/payroll/run` | Run payroll for one employee |
-| POST | `/payroll/run-batch` | Run payroll for all active employees (optionally one SSF group) |
-| GET | `/payroll` | List runs |
-| GET | `/payroll/:id` | One run (all figures, full data) |
-| GET | `/payroll/employee/:employeeId` | Payslip history for one employee |
-| GET | `/payroll/ssf/:status?periodStart=` | Filter runs by `SSF` or `NON_SSF` |
-| GET | `/payroll/:id/payslip` | **Employee payslip (HTML)** |
-| GET | `/payroll/:id/payslip?view=admin` | **Admin payslip with confidential and employer-cost data (HTML)** |
+| Method | Path                                | Purpose                                                           |
+| ------ | ----------------------------------- | ----------------------------------------------------------------- |
+| POST   | `/payroll/run`                      | Run payroll for one employee                                      |
+| POST   | `/payroll/run-batch`                | Run payroll for all active employees (optionally one SSF group)   |
+| GET    | `/payroll`                          | List runs                                                         |
+| GET    | `/payroll/:id`                      | One run (all figures, full data)                                  |
+| GET    | `/payroll/employee/:employeeId`     | Payslip history for one employee                                  |
+| GET    | `/payroll/ssf/:status?periodStart=` | Filter runs by `SSF` or `NON_SSF`                                 |
+| GET    | `/payroll/:id/payslip`              | **Employee payslip (HTML)**                                       |
+| GET    | `/payroll/:id/payslip?view=admin`   | **Admin payslip with confidential and employer-cost data (HTML)** |
 
 **Run one employee**
 
@@ -381,25 +386,27 @@ The frontend is a single-page React app covering every backend capability above.
 
 **Pages, by sidebar group**
 
-| Group | Page | Covers |
-|---|---|---|
-| Overview | Dashboard | Active employee count (SSF/non-SSF split), this month's runs, net pay this month, outstanding advances, a config warning banner, and quick links |
-| Payroll | Run Payroll | Single-employee run (employee, period, overtime hours, advance recovery mode) with a live side panel of active advances and payable reimbursements; Batch run by period + SSF group with a succeeded/skipped/failed result breakdown |
-| Payroll | Payroll Runs | Filterable list of every run (by period, SSF group), linking to run detail |
-| Payroll | Salaries | Assign basic pay + dynamic allowance rows to an employee; revise (new effective-dated version, never edits in place) |
-| Payroll | Allowances | Catalog CRUD: fixed/percentage calculation type, taxable toggle, secret toggle, active toggle |
-| Payroll | Advances | Give an advance; list with a recovery progress bar and an expandable deduction history |
-| Payroll | Reimbursements | Add one-time or recurring reimbursements; filter by status; mark applied / stop from the list |
-| People | Employees | CRUD with employment details and bank details |
-| Configuration | Payroll Config | Fiscal year rates (SSF employee/employer %, security fund %, OT multiplier) and a tax slab editor enforcing ascending order with exactly one open-ended top slab |
+| Group         | Page           | Covers                                                                                                                                                                                                                               |
+| ------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Overview      | Dashboard      | Active employee count (SSF/non-SSF split), this month's runs, net pay this month, outstanding advances, a config warning banner, and quick links                                                                                     |
+| Payroll       | Run Payroll    | Single-employee run (employee, period, overtime hours, advance recovery mode) with a live side panel of active advances and payable reimbursements; Batch run by period + SSF group with a succeeded/skipped/failed result breakdown |
+| Payroll       | Payroll Runs   | Filterable list of every run (by period, SSF group), linking to run detail                                                                                                                                                           |
+| Payroll       | Salaries       | Assign basic pay + dynamic allowance rows to an employee; revise (new effective-dated version, never edits in place)                                                                                                                 |
+| Payroll       | Allowances     | Catalog CRUD: fixed/percentage calculation type, taxable toggle, secret toggle, active toggle                                                                                                                                        |
+| Payroll       | Advances       | Give an advance; list with a recovery progress bar and an expandable deduction history                                                                                                                                               |
+| Payroll       | Reimbursements | Add one-time or recurring reimbursements; filter by status; mark applied / stop from the list                                                                                                                                        |
+| People        | Employees      | CRUD with employment details and bank details                                                                                                                                                                                        |
+| Configuration | Payroll Config | Fiscal year rates (SSF employee/employer %, security fund %, OT multiplier) and a tax slab editor enforcing ascending order with exactly one open-ended top slab                                                                     |
 
 **Run detail page.** Selecting a run from Payroll Runs (or from a just-completed run) opens a detail page with:
+
 - Summary cards for gross, deductions, net pay, and employer cost
 - An earnings/deductions breakdown, including the monthly → annualized → annual tax figures
 - A **"Show admin figures"** toggle that reveals secret allowance lines and the employer SSF contribution
 - An embedded **payslip viewer** (iframe pointed at the backend's HTML payslip route) with its own Employee/Admin toggle and a print button, so the actual server-rendered payslip — not a frontend reconstruction — is what gets printed or saved as a PDF
 
 **Design conventions used throughout:**
+
 - Every list page follows the same shape: a header with a primary action button, an optional filter row, and a table with row-level actions.
 - Every create/edit form is a modal (or a right-side drawer for the longer Employee form) with a sticky header/footer, RHF-driven fields, and inline Zod or RHF-rule validation messages.
 - Selects with a dynamically-filtered option list (e.g. the allowance picker on the Salary form) are built with `Controller` rather than plain `register`, so the displayed selection can't desync from form state when the option list changes underneath it.
@@ -420,24 +427,24 @@ The view is chosen by a query flag, as the assignment allows. It is not authenti
 
 ## 10. Edge cases handled
 
-| Case | Behaviour |
-|---|---|
-| SSF vs non-SSF | Non-SSF employees get no SSF line and no SSF-linked tax exemption |
-| Secret component | Excluded from TDS and SSF, hidden from the employee payslip, present in admin gross and employer cost |
-| One-time reimbursement | Included once, then marked `APPLIED` and never included again |
-| Recurring reimbursement | Included every cycle until stopped |
-| Applied or stopped reimbursement | Cannot be edited or deleted (protects payroll history); the frontend hides the apply/stop actions once a reimbursement reaches that state |
-| Multiple active advances | Recovered oldest first |
-| Advance recovery exceeds balance | Rejected with 400 if explicitly requested |
-| Advance recovery would make net pay negative | When not explicitly requested, recovery is capped at what net pay can absorb |
-| Advance fully recovered | Balance reaches 0 and status becomes `SETTLED`; excluded from later runs |
-| Duplicate payroll run | Blocked with 409, both by a pre-check and by a unique index (covers concurrent requests); the frontend surfaces the 409 message directly on the run form |
-| Missing salary or missing config | 400 with a message saying what to create; the dashboard also shows a banner when no config is active for today |
-| New fiscal year | Insert a new `PayrollConfig`; no code change; old payslips are unaffected |
-| Employee joins mid-period | Prorated by calendar days |
-| Joins after the period ends | Rejected (single run) or skipped (batch) |
-| Bad dates / negative hours | 400 at validation |
-| Configuration changed after a run | Old payslip unchanged, thanks to the full snapshot |
+| Case                                         | Behaviour                                                                                                                                                |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SSF vs non-SSF                               | Non-SSF employees get no SSF line and no SSF-linked tax exemption                                                                                        |
+| Secret component                             | Excluded from TDS and SSF, hidden from the employee payslip, present in admin gross and employer cost                                                    |
+| One-time reimbursement                       | Included once, then marked `APPLIED` and never included again                                                                                            |
+| Recurring reimbursement                      | Included every cycle until stopped                                                                                                                       |
+| Applied or stopped reimbursement             | Cannot be edited or deleted (protects payroll history); the frontend hides the apply/stop actions once a reimbursement reaches that state                |
+| Multiple active advances                     | Recovered oldest first                                                                                                                                   |
+| Advance recovery exceeds balance             | Rejected with 400 if explicitly requested                                                                                                                |
+| Advance recovery would make net pay negative | When not explicitly requested, recovery is capped at what net pay can absorb                                                                             |
+| Advance fully recovered                      | Balance reaches 0 and status becomes `SETTLED`; excluded from later runs                                                                                 |
+| Duplicate payroll run                        | Blocked with 409, both by a pre-check and by a unique index (covers concurrent requests); the frontend surfaces the 409 message directly on the run form |
+| Missing salary or missing config             | 400 with a message saying what to create; the dashboard also shows a banner when no config is active for today                                           |
+| New fiscal year                              | Insert a new `PayrollConfig`; no code change; old payslips are unaffected                                                                                |
+| Employee joins mid-period                    | Prorated by calendar days                                                                                                                                |
+| Joins after the period ends                  | Rejected (single run) or skipped (batch)                                                                                                                 |
+| Bad dates / negative hours                   | 400 at validation                                                                                                                                        |
+| Configuration changed after a run            | Old payslip unchanged, thanks to the full snapshot                                                                                                       |
 
 ---
 
@@ -492,13 +499,13 @@ The spec is ambiguous in places. These are the decisions made, all easy to chang
 
 ## 14. Sample payslips
 
-Generate these from the running system and save the browser's *Print → Save as PDF* output into `/samples`:
+Generate these from the running system and save the browser's _Print → Save as PDF_ output into `/samples`:
 
-| File | Employee | View |
-|---|---|---|
-| `payslip-ssf-employee.pdf` | SSF-registered, with the secret component | Employee |
-| `payslip-ssf-admin.pdf` | Same run | Admin (`?view=admin`) |
-| `payslip-non-ssf.pdf` | Non-SSF employee | Employee |
+| File                       | Employee                                  | View                  |
+| -------------------------- | ----------------------------------------- | --------------------- |
+| `payslip-ssf-employee.pdf` | SSF-registered, with the secret component | Employee              |
+| `payslip-ssf-admin.pdf`    | Same run                                  | Admin (`?view=admin`) |
+| `payslip-non-ssf.pdf`      | Non-SSF employee                          | Employee              |
 
 **Allowance seed payloads** (`POST /allowances`, or via the Allowances page)
 
@@ -544,29 +551,29 @@ Create one employee with `ssfStatus: "SSF"` and one with `ssfStatus: "NON_SSF"`.
 _Add screenshots here before submission — suggested set:_
 
 - Dashboard
-![alt text](image-3.png)
+  ![alt text](image-3.png)
 - Employees list + the add/edit drawer
-![alt text](image-4.png)
-![alt text](image-5.png)
+  ![alt text](image-4.png)
+  ![alt text](image-5.png)
 - Salaries — the dynamic allowance rows editor
-![alt text](image-6.png)
-![alt text](image-7.png)
+  ![alt text](image-6.png)
+  ![alt text](image-7.png)
 - Payroll Config — the tax slab editor
-![alt text](image-8.png)
-![alt text](image-9.png)
+  ![alt text](image-8.png)
+  ![alt text](image-9.png)
 - Advances — the recovery progress bar and expanded deduction history
-![alt text](image-10.png)
-![alt text](image-11.png)
+  ![alt text](image-10.png)
+  ![alt text](image-11.png)
 - Reimbursements — filtered by status
-![alt text](image-12.png)
-![alt text](image-13.png)
+  ![alt text](image-12.png)
+  ![alt text](image-13.png)
 - Run Payroll — single run with the side context panel
-![alt text](image-14.png)
+  ![alt text](image-14.png)
 - Run Payroll — batch run result breakdown
-![alt text](image-15.png)
+  ![alt text](image-15.png)
 - Payroll run detail — employee figures vs. admin figures toggled on
-that negative salary are calculated because of bugs that is fixed 
-![alt text](image-16.png)
+  that negative salary are calculated because of bugs that is fixed
+  ![alt text](image-16.png)
 - The embedded payslip viewer, both employee and admin view
-![alt text](image-1.png)
-![alt text](image-2.png)
+  ![alt text](image-1.png)
+  ![alt text](image-2.png)
