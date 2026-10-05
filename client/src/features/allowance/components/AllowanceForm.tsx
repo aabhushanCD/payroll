@@ -33,7 +33,7 @@ type Props = {
   onSubmit: (input: AllowanceFormData) => void;
 };
 
-// Small reusable toggle so taxable/isActive read as switches, not checkboxes.
+// Small reusable toggle so taxable/isActive/isSecret read as switches, not checkboxes.
 const Toggle = ({
   checked,
   onChange,
@@ -92,7 +92,6 @@ const AllowanceForm = ({
   }, [isOpen, allowance, reset]);
 
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-md rounded-lg border border-[#233647] bg-[#152331]">
@@ -214,6 +213,18 @@ const AllowanceForm = ({
                     onChange={field.onChange}
                     label="Active"
                     description="Available for assignment on payroll runs"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="isSecret"
+                render={({ field }) => (
+                  <Toggle
+                    checked={field.value}
+                    onChange={field.onChange}
+                    label="Secret"
+                    description="Only visible to payroll admins and superadmins"
                   />
                 )}
               />

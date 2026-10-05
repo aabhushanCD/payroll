@@ -19,3 +19,13 @@ allowanceRouter.put(
   allowanceController.updateAllowanceHandler,
 );
 allowanceRouter.delete("/:id", allowanceController.deleteAllowanceHandler);
+
+allowanceRouter.patch(
+  "/:id/toggle-active",
+  allowanceController.toggleActiveStatusHandler,
+);
+
+allowanceRouter.patch(
+  "/:id/toggle-secret",
+  allowanceController.toggleSecretStatusHandler,
+);

@@ -128,7 +128,7 @@ const AsideNav = () => {
 
           {!collapsed && (
             <div className="leading-tight">
-              <div className="text-sm font-semibold text-[#E6ECF1]">Semal</div>
+              <div className="text-sm font-semibold text-[#E6ECF1]">Simal</div>
               <div className="text-xs text-[#7E93A6]">Payroll</div>
             </div>
           )}
@@ -207,7 +207,9 @@ const AsideNav = () => {
 
           {!collapsed && (
             <div className="leading-tight min-w-0">
-              <div className="text-sm font-medium text-[#E6ECF1] truncate">Aabhushan Dhakal</div>
+              <div className="text-sm font-medium text-[#E6ECF1] truncate">
+                Aabhushan Dhakal
+              </div>
               <div className="text-xs text-[#7E93A6] truncate">
                 Payroll admin
               </div>

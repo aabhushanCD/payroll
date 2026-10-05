@@ -3,15 +3,7 @@ import type { PayrollCalcInput, PayrollCalcResult } from "./payroll.types.ts";
 
 /**
  * =========================================================================
- * TYPES
- * =========================================================================
- */
-
-/**
- * =========================================================================
- * ASSUMPTIONS (mirror these in the README — these are the genuinely
- * ambiguous spots the assignment tells you to resolve and document rather
- * than pause on)
+ * ASSUMPTIONS
  * =========================================================================
  *
  * 1. SSF base = basicSalary only. Per Nepal's Labour Rules, basic must be

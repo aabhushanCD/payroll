@@ -43,6 +43,7 @@ const updateAllowanceHandler = async (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log("Updating allowance with ID:", req.body);
   const allowance = await allowanceService.updateAllowance(
     req.params.id as string,
     req.body,
@@ -81,6 +82,26 @@ const deleteAllowanceHandler = async (req: Request, res: Response) => {
   res.status(200).json({ message: "Allowance deleted" });
 };
 
+const toggleActiveStatusHandler = async (req: Request, res: Response) => {
+  const allowance = await allowanceService.toggleActiveStatus(
+    req.params.id as string,
+  );
+  if (!allowance) {
+    throw new AppError("Allowance not found", 404);
+  }
+  res.status(200).json({ message: "Allowance active status toggled" });
+};
+
+const toggleSecretStatusHandler = async (req: Request, res: Response) => {
+  const allowance = await allowanceService.toggleSecretStatus(
+    req.params.id as string,
+  );
+  if (!allowance) {
+    throw new AppError("Allowance not found", 404);
+  }
+  res.status(200).json({ message: "Allowance secret status toggled" });
+};
+
 export const allowanceController = {
   listAllowancesHandler,
 
@@ -93,4 +114,8 @@ export const allowanceController = {
   deactivateAllowanceHandler,
 
   deleteAllowanceHandler,
+
+  toggleActiveStatusHandler,
+
+  toggleSecretStatusHandler,
 };

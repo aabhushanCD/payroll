@@ -6,6 +6,8 @@ import {
   useCreateAllowance,
   useUpdateAllowance,
   useDeleteAllowance,
+  useToggleSecret,
+  useToggleActive,
 } from "../hooks/useAllowances";
 
 import type { AllowanceFormData } from "../schema/AllowanceSchema";
@@ -55,7 +57,8 @@ const Allowances = () => {
   const createAllowance = useCreateAllowance();
   const updateAllowance = useUpdateAllowance();
   const deleteAllowance = useDeleteAllowance();
-
+  const toggleSecret = useToggleSecret();
+  const toggleActive = useToggleActive();
   const [query, setQuery] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAllowance, setEditingAllowance] = useState<Allowance | null>(
@@ -89,16 +92,20 @@ const Allowances = () => {
         { id: editingAllowance._id, data },
         { onSuccess: closeForm },
       );
+      console.log("Allowance created:", data);
     } else {
       createAllowance.mutate(data, { onSuccess: closeForm });
+      console.log("Allowance created:", data);
     }
   };
 
-  const toggleActive = (allowance: Allowance) => {
-    updateAllowance.mutate({
-      id: allowance._id,
-      data: { isActive: !allowance.isActive },
-    });
+  const toggler = (allowance: Allowance, toggleType: "secret" | "active") => {
+    if (toggleType === "secret") {
+      toggleSecret.mutate(allowance);
+    }
+    if (toggleType === "active") {
+      toggleActive.mutate(allowance);
+    }
   };
 
   const pendingDeleteAllowance = allowances.find(
@@ -156,6 +163,7 @@ const Allowances = () => {
               <th className="font-medium px-5 py-3">Amount</th>
               <th className="font-medium px-5 py-3">Taxable</th>
               <th className="font-medium px-5 py-3">Active</th>
+              <th className="font-medium px-5 py-3">Secret</th>
               <th className="font-medium px-5 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -207,7 +215,14 @@ const Allowances = () => {
                   <td className="px-5 py-3">
                     <StatusSwitch
                       checked={allowance.isActive}
-                      onChange={() => toggleActive(allowance)}
+                      onChange={() => toggler(allowance, "active")}
+                      disabled={updateAllowance.isPending}
+                    />
+                  </td>
+                  <td className="px-5 py-3">
+                    <StatusSwitch
+                      checked={allowance.isSecret}
+                      onChange={() => toggler(allowance, "secret")}
                       disabled={updateAllowance.isPending}
                     />
                   </td>

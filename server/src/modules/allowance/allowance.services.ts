@@ -49,6 +49,33 @@ const deleteAllowance = async (
   return AllowanceModel.findByIdAndDelete(id);
 };
 
+const toggleActiveStatus = async (
+  id: string,
+): Promise<AllowanceDocument | null> => {
+  const allowance = await AllowanceModel.findById(id);
+  if (!allowance) {
+    throw new AppError("Allowance not found", 404);
+  }
+  return AllowanceModel.findByIdAndUpdate(
+    id,
+    { isActive: !allowance.isActive },
+    { new: true },
+  );
+};
+const toggleSecretStatus = async (
+  id: string,
+): Promise<AllowanceDocument | null> => {
+  const allowance = await AllowanceModel.findById(id);
+  if (!allowance) {
+    throw new AppError("Allowance not found", 404);
+  }
+  return AllowanceModel.findByIdAndUpdate(
+    id,
+    { isSecret: !allowance.isSecret },
+    { new: true },
+  );
+};
+
 export const allowanceService = {
   getAllowances,
 
@@ -61,4 +88,8 @@ export const allowanceService = {
   deactivateAllowance,
 
   deleteAllowance,
+
+  toggleActiveStatus,
+
+  toggleSecretStatus,
 };

@@ -116,10 +116,10 @@ const AdvancePage = () => {
                             {a.deductions.map((d, i) => (
                               <li key={i} className="flex gap-6 text-[#7E93A6]">
                                 <span className="w-28">
-                                  {formatDate(d.date)}
+                                  {formatDate(d.deductedOn)}
                                 </span>
                                 <span className="text-[#E6ECF1]">
-                                  {formatNPR(d.amount)}
+                                  {formatNPR(d.amountDeducted)}
                                 </span>
                               </li>
                             ))}

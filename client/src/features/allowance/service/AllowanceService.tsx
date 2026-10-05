@@ -29,12 +29,37 @@ const deleteAllowance = async (id: string) => {
   return response.data;
 };
 
+const toggleSecret = async (allowance: Allowance) => {
+  const response = await api.patch(
+    `/allowances/${allowance._id}/toggle-secret`,
+    {
+      isSecret: !allowance.isSecret,
+    },
+  );
+
+  return response.data;
+};
+const toggleActive = async (allowance: Allowance) => {
+  const response = await api.patch(
+    `/allowances/${allowance._id}/toggle-active`,
+    {
+      isActive: !allowance.isActive,
+    },
+  );
+
+  return response.data;
+};
+
 export const allowanceServices = {
   getAllowances,
 
   createAllowance,
 
   updateAllowance,
+
+  toggleSecret,
+
+  toggleActive,
 
   deleteAllowance,
 };

@@ -1,9 +1,10 @@
 import type { Employee } from "../../employee/types/types";
 
 export type AdvanceDeduction = {
-  amount: number;
-  date: string;
-  payrollRunId?: string;
+  payrollRunId: string;
+  amountDeducted: number;
+  deductedOn: string;
+  _id: string;
 };
 
 export type Advance = {

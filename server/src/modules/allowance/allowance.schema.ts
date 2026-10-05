@@ -10,7 +10,7 @@ export const allowanceSchema = z
       .min(0, "Amount can't be negative"),
     taxable: z.boolean(),
     isActive: z.boolean(),
-    isScrete: z.boolean().default(false),
+    isSecret: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
     if (data.calculationType === "PERCENTAGE" && data.defaultAmount > 100) {
