@@ -170,11 +170,3 @@ Payroll run endpoint accepts an optional `employmentType` filter (`SSF` | `NON_S
 | 10 | Payroll run filtered by `employmentType=SSF` | Returns only SSF employees, correct subtotal |
 
 ---
-
-## 8. Open Assumptions Log (copy into README)
-
-1. Monthly TDS = annualized-and-divided MVP method (not true YTD cumulative).
-2. SSF base = Basic Pay only (not DA/Conveyance/allowances), per the assignment's explicit "31% of basic pay."
-3. Reimbursements (one-time and recurring) are non-taxable, non-SSF-contributory — treated as expense repayment, not income.
-4. In-house Security Fund base = Basic Pay (same base as SSF), for consistency, since the assignment doesn't specify.
-5. Advance recovery amount per cycle is a configured fixed amount per advance (not automatically recalculated); partial final recovery is capped at the remaining balance.
